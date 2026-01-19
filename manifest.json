@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Nihongo Translator & Grammar",
+  "version": "1.0",
+  "description": "Tradução e análise gramatical de Japonês/Português com popup ativado por atalho.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["main_dataset_pt.json"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "gramma-checker.js", 
+        "speaker.js", 
+        "dictionary-service.js", 
+        "popup-extension.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
