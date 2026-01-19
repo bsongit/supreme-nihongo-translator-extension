@@ -226,14 +226,37 @@
                 kanjiData.forEach(entry => {
                     // --- INÍCIO DA ADIÇÃO: Exibir Variantes (Vocabulário) PRIMEIRO ---
                     if (entry.variants) {
-                        const variantKeys = Object.keys(entry.variants);
+                        let variantKeys = Object.keys(entry.variants);
                         if (variantKeys.length > 0) {
+                            // Filtra variantes se houver um match específico (mais de 1 caracter)
+                            const matches = variantKeys.filter(v => textToRead.includes(v));
+                            const hasLongMatch = matches.some(v => v.length > 1);
+                            
+                            if (hasLongMatch) {
+                                variantKeys = matches;
+                            }
+
+                            // Ordena para que variantes encontradas no texto apareçam primeiro
+                            variantKeys.sort((a, b) => {
+                                const aInText = textToRead.includes(a);
+                                const bInText = textToRead.includes(b);
+                                return (bInText ? 1 : 0) - (aInText ? 1 : 0);
+                            });
+
                             contentHTML += `<div style="background: #fff8e1; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #ffe0b2;">`;
                             contentHTML += `<div style="font-size: 0.85em; font-weight: bold; color: #f57c00; margin-bottom: 5px;">Vocabulário / Contexto:</div>`;
                             
-                            variantKeys.forEach(variant => {
-                                contentHTML += `<div style="font-size: 0.9em; margin-bottom: 3px; line-height: 1.3;">
-                                    <span style="color: #333; font-weight: bold;">${variant}</span>: ${entry.variants[variant]}
+                            [variantKeys[0]].forEach(variant => {
+                                const isMatch = textToRead.includes(variant);
+                                const rowStyle = isMatch 
+                                    ? "background: #ffe0b2; padding: 3px 5px; border-radius: 3px; margin-bottom: 4px; border-left: 3px solid #ef6c00;" 
+                                    : "margin-bottom: 3px;";
+                                const wordStyle = isMatch
+                                    ? "color: #bf360c; font-weight: bold;"
+                                    : "color: #333; font-weight: bold;";
+
+                                contentHTML += `<div style="font-size: 0.9em; line-height: 1.3; ${rowStyle}">
+                                    <span style="${wordStyle}">${variant}</span>: ${entry.variants[variant]}
                                 </div>`;
                             });
                             contentHTML += `</div>`;
