@@ -199,8 +199,8 @@
                 grammarData.forEach(g => {
                     contentHTML += `
                         <div style="margin-top:5px; font-size:0.9em;">
-                            <span style="color:#2980b9; font-weight:bold;">${g.text}</span> (${g.level})<br>
-                            ${g.description}
+                            <div style="color:#555; margin-bottom:2px;">...${g.formattedContext}...</div>
+                            <span style="color:#2980b9; font-weight:bold; font-size:0.9em;">${g.level}</span>: ${g.description}
                         </div>
                     `;
                 });
@@ -211,6 +211,7 @@
             if (katakanaData && katakanaData.length > 0) {
                 contentHTML += `<div style="background:#fff3e0; padding:8px; border-radius:4px; margin-bottom:10px;"><strong>Katakana (Romaji):</strong><br>`;
                 katakanaData.forEach(k => {
+                    
                     contentHTML += `
                         <div style="margin-top:3px; font-size:0.9em;">
                             <span style="color:#e67e22; font-weight:bold;">${k.text}</span> → ${k.romaji}
@@ -223,6 +224,23 @@
             if (kanjiData && kanjiData.length > 0) {
                 contentHTML += `<div style="background:#f9f9f9; padding:8px; border-radius:4px; margin-bottom:10px;">`;
                 kanjiData.forEach(entry => {
+                    // --- INÍCIO DA ADIÇÃO: Exibir Variantes (Vocabulário) PRIMEIRO ---
+                    if (entry.variants) {
+                        const variantKeys = Object.keys(entry.variants);
+                        if (variantKeys.length > 0) {
+                            contentHTML += `<div style="background: #fff8e1; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #ffe0b2;">`;
+                            contentHTML += `<div style="font-size: 0.85em; font-weight: bold; color: #f57c00; margin-bottom: 5px;">Vocabulário / Contexto:</div>`;
+                            
+                            variantKeys.forEach(variant => {
+                                contentHTML += `<div style="font-size: 0.9em; margin-bottom: 3px; line-height: 1.3;">
+                                    <span style="color: #333; font-weight: bold;">${variant}</span>: ${entry.variants[variant]}
+                                </div>`;
+                            });
+                            contentHTML += `</div>`;
+                        }
+                    }
+                    // --- FIM DA ADIÇÃO ---
+
                     const char = entry.char || (entry.variants ? Object.keys(entry.variants)[0] : '?');
                     const reading = entry.on ? entry.on.join(', ') : (entry.kun ? entry.kun.join(', ') : '');
                     const meaning = entry.ptbr || (entry.meanings ? entry.meanings[0] : '');

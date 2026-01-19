@@ -10,39 +10,39 @@ class JapaneseGrammarScanner {
         return [
             // N5
                   // N5 - Ajustado para evitar falsos positivos
-            { pattern: /(?<!で)は(?!です|した)/g, level: "N5", description: "Particula 'wa', marca o tópico da frase" },
-            { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula 'ga', Indica o sujeito da frase, especialmente para dar ênfase, introduzir novas informações ou com verbos de habilidade/afinidade. Também pode indicar 'mas' quando está no final de uma frase." },
-            { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula 'wo', Indica o objeto direto de um verbo transitivo. Na fala moderna, pronuncia-se 'o', e não 'wo'." },
-            { pattern: /(?<!で)も(?!の|う)/g, level: "N5", description: "Partícula 'mo', Indica também'" },
-            { pattern: /(?<!で)に(?!は|も|の|します)/g, level: "N5", description: "Partícula de tempo/destino" },
-            { pattern: /(?<!で)で(?![すしょ])/g, level: "N5", description: "Partícula de local/instrumento" },
-            { pattern: /(?<!で)へ(?!の)/g, level: "N5", description: "Partícula de direção" },
-            { pattern: /(?<!で)と(?!いう|思う)/g, level: "N5", description: "Partícula 'e' ou 'com'" },
-            { pattern: /(?<!で)や(?!く)/g, level: "N5", description: "Partícula 'e' (lista não exaustiva)" },
-            { pattern: /(?<!で)の(?![ばりき])/g, level: "N5", description: "Partícula de posse" },
-            { pattern: /から(?![のと])/g, level: "N5", description: "Partícula 'de' ou 'porque'" },
-            { pattern: /(?<!でし)まで(?![のと])/g, level: "N5", description: "Partícula 'até'" },
+            { pattern: /(?<!で)は(?!です|した)/g, level: "N5", description: "Partícula 'wa'. Marca o tópico da frase, indicando sobre quem ou o que se está falando." },
+            { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula 'ga'. Indica o sujeito da frase, usada para dar ênfase, introduzir novas informações ou com verbos de habilidade/desejo." },
+            { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula 'wo' (pronunciada 'o'). Indica o objeto direto de um verbo transitivo, ou seja, quem sofre a ação." },
+            { pattern: /(?<!で)も(?!の|う)/g, level: "N5", description: "Partícula 'mo'. Significa 'também' ou 'tampouco'. Substitui outras partículas para indicar inclusão." },
+            { pattern: /(?<!で)に(?!は|も|の|します)/g, level: "N5", description: "Partícula 'ni'. Indica tempo específico, ponto de destino (ir a), ou alvo de uma ação (dar a)." },
+            { pattern: /(?<!で)で(?![すしょ])/g, level: "N5", description: "Partícula 'de'. Indica o local onde uma ação ocorre ou o instrumento/meio utilizado para realizá-la." },
+            { pattern: /(?<!で)へ(?!の)/g, level: "N5", description: "Partícula 'he' (pronunciada 'e'). Indica a direção para onde se vai, focando no movimento." },
+            { pattern: /(?<!で)と(?!いう|思う)/g, level: "N5", description: "Partícula 'to'. Significa 'e' (para listas completas) ou 'com' (companhia). Também marca citações." },
+            { pattern: /(?<!で)や(?!く)/g, level: "N5", description: "Partícula 'ya'. Significa 'e' (para listas não exaustivas, implicando que há mais itens)." },
+            { pattern: /(?<!で)の(?![ばりき])/g, level: "N5", description: "Partícula 'no'. Indica posse, modificação ou pertencimento (conecta substantivos)." },
+            { pattern: /から(?![のと])/g, level: "N5", description: "Partícula 'kara'. Indica o ponto de partida (tempo/espaço) ou a causa/razão ('porque')." },
+            { pattern: /(?<!でし)まで(?![のと])/g, level: "N5", description: "Partícula 'made'. Indica o limite final de tempo ou espaço ('até')." },
             
             // Padrões mais complexos com prioridade alta (para evitar falsos positivos)
-            { pattern: /てください(?![ょ])/g, level: "N5", description: "Pedido polido" },
-            { pattern: /ています(?![ょ])/g, level: "N5", description: "Ação contínua" },
-            { pattern: /てはいけません/g, level: "N5", description: "Proibição" },
-            { pattern: /てもいいです/g, level: "N5", description: "Permissão" },
-            { pattern: /たことがある/g, level: "N5", description: "Experiência passada" },
-            { pattern: /ないでください/g, level: "N5", description: "Pedido negativo" },
-            { pattern: /(?<!で)ながら(?!の)/g, level: "N5", description: "Ação simultânea" },
-            { pattern: /(?<!でし)たい(?!い)/g, level: "N5", description: "Querer fazer" },
-            { pattern: /たくない(?!い)/g, level: "N5", description: "Não querer fazer" },
-            { pattern: /まえに(?!は)/g, level: "N5", description: "Antes de" },
-            { pattern: /あとで(?!は)/g, level: "N5", description: "Depois de" },
-            { pattern: /(?<!でし)とき(?!は)/g, level: "N5", description: "Quando" },
+            { pattern: /てください(?![ょ])/g, level: "N5", description: "Forma 'te' + kudasai. Usada para fazer pedidos ou solicitações de maneira polida ('por favor, faça')." },
+            { pattern: /ています(?![ょ])/g, level: "N5", description: "Forma 'te' + imasu. Indica uma ação que está acontecendo agora (gerúndio) ou um estado contínuo." },
+            { pattern: /てはいけません/g, level: "N5", description: "Forma 'te' + wa ikemasen. Expressa uma proibição formal ('não deve fazer', 'é proibido')." },
+            { pattern: /てもいいです/g, level: "N5", description: "Forma 'te' + mo ii desu. Expressa permissão ('pode fazer', 'está tudo bem se fizer')." },
+            { pattern: /たことがある/g, level: "N5", description: "Verbo passado (ta) + koto ga aru. Indica experiência passada ('já fiz isso')." },
+            { pattern: /ないでください/g, level: "N5", description: "Forma 'nai' + de kudasai. Pedido polido para NÃO fazer algo ('por favor, não faça')." },
+            { pattern: /(?<!で)ながら(?!の)/g, level: "N5", description: "Raiz do verbo + nagara. Indica duas ações simultâneas ('enquanto faz X, faz Y')." },
+            { pattern: /(?<!でし)たい(?!い)/g, level: "N5", description: "Raiz do verbo + tai. Expressa desejo do falante ('quero fazer')." },
+            { pattern: /たくない(?!い)/g, level: "N5", description: "Raiz do verbo + takunai. Expressa falta de desejo ('não quero fazer')." },
+            { pattern: /まえに(?!は)/g, level: "N5", description: "Verbo dicionário + mae ni. Significa 'antes de' realizar a ação." },
+            { pattern: /あとで(?!は)/g, level: "N5", description: "Verbo passado (ta) + ato de. Significa 'depois de' realizar a ação." },
+            { pattern: /(?<!でし)とき(?!は)/g, level: "N5", description: "Verbo/Adjetivo + toki. Indica o momento em que algo acontece ('quando')." },
             
             // Adiciona padrões para capturar expressões completas primeiro
-            { pattern: /です(?!て)/g, level: "N5", description: "Verbo ser/estar polido" },
-            { pattern: /ます(?!て)/g, level: "N5", description: "Finalizador polido para verbos" },
-            { pattern: /でしょう(?!う)/g, level: "N4", description: "Provavelmente" },
-            { pattern: /でした(?!た)/g, level: "N5", description: "Passado de 'desu'" },
-            { pattern: /ません(?!か)/g, level: "N5", description: "Negativo polido" },
+            { pattern: /です(?!て)/g, level: "N5", description: "Cópula polida 'desu'. Funciona como 'ser' ou 'estar' em frases nominais/adjetivas." },
+            { pattern: /ます(?!て)/g, level: "N5", description: "Sufixo verbal 'masu'. Indica polidez no tempo presente/futuro." },
+            { pattern: /でしょう(?!う)/g, level: "N4", description: "Expressa incerteza, probabilidade ('provavelmente') ou busca confirmação ('né?')." },
+            { pattern: /でした(?!た)/g, level: "N5", description: "Passado polido da cópula 'desu' ('era', 'foi')." },
+            { pattern: /ません(?!か)/g, level: "N5", description: "Forma negativa polida de verbos ('não faço')." },
             
             // N4 - Com ajustes similares
             { pattern: /てみる(?!る)/g, level: "N4", description: "Tentar fazer" },
@@ -237,6 +237,11 @@ class JapaneseGrammarScanner {
                     const contextEnd = Math.min(text.length, endPos + 15);
                     const context = text.substring(contextStart, contextEnd);
                     
+                    // Cria contexto formatado com a estrutura em negrito
+                    const relStart = startPos - contextStart;
+                    const relEnd = endPos - contextStart;
+                    const formattedContext = context.substring(0, relStart) + "<b>" + context.substring(relStart, relEnd) + "</b>" + context.substring(relEnd);
+
                     results.push({
                         text: match[0],
                         level: patternInfo.level,
@@ -244,6 +249,7 @@ class JapaneseGrammarScanner {
                         position: startPos,
                         endPosition: endPos,
                         context: context,
+                        formattedContext: formattedContext,
                         pattern: patternInfo.pattern.source
                     });
                 }
