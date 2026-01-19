@@ -1,0 +1,27 @@
+{
+     "九": {
+    "char": "九",
+    "variants": {
+      "九州": "(kyuushuu) - Kyushu (a mais ao sul das quatro ilhas principais do Japão)",
+      "九": "(nove) - nove"
+    },
+    "strokes": 2,
+    "jlpt": 5,
+    "meanings": [
+      "Nove"
+    ],
+    "on": [
+      "きゅう",
+      "く"
+    ],
+    "kun": [
+      "ここの",
+      "ここの.つ",
+      "!ここの"
+    ],
+    "radicals": [
+      "Nove"
+    ],
+    "ptbr": "nove"
+  }
+}

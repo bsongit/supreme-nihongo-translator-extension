@@ -12,6 +12,7 @@
             // Serviços
             this.dictionaryService = null;
             this.grammarScanner = null;
+            this.katakanaChecker = null;
             this.speaker = null;
 
             this.init();
@@ -20,13 +21,14 @@
         async init() {
             try {
                 // Carrega o dataset do arquivo local da extensão
-                const dataUrl = chrome.runtime.getURL('main_dataset_pt.json');
+                const dataUrl = chrome.runtime.getURL('nerver_read_files_here/main_dataset_pt.json');
                 const response = await fetch(dataUrl);
                 this.dataset = await response.json();
 
                 // Inicializa os serviços com as classes existentes
                 this.dictionaryService = new DictionaryService(this.dataset);
                 this.grammarScanner = new JapaneseGrammarScanner();
+                this.katakanaChecker = new KatakanaChecker();
                 // Tenta usar a instância global criada pelo speaker.js ou cria uma nova
                 this.speaker = window.reader || new JapaneseTextReader();
 
@@ -147,6 +149,7 @@
             let textToRead = '';
             let kanjiData = [];
             let grammarData = [];
+            let katakanaData = [];
 
             if (isJP) {
                 // === JP -> PT ===
@@ -154,6 +157,7 @@
                 const translation = this.dictionaryService.translateToPT(text);
                 kanjiData = translation.kanjiBreakdown;
                 grammarData = this.grammarScanner.scanTextOptimized(text);
+                katakanaData = this.katakanaChecker.scan(text);
 
                 contentHTML = `
                     <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
@@ -168,6 +172,7 @@
                 kanjiData = translation.matches;
                 // Analisa a gramática do resultado em japonês
                 grammarData = this.grammarScanner.scanTextOptimized(textToRead);
+                katakanaData = this.katakanaChecker.scan(textToRead);
 
                 contentHTML = `
                     <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
@@ -201,6 +206,18 @@
                             <span style="font-size:0.8em; color:#666;">JLPT: N${entry.jlpt || '-'} | Traços: ${entry.strokes || '-'}</span>
                         </div>
                     `;
+                });
+                contentHTML += `</div>`;
+            }
+
+            // Identificação de Katakana (Loanwords)
+            if (katakanaData && katakanaData.length > 0) {
+                contentHTML += `<div style="background:#fff3e0; padding:8px; border-radius:4px; margin-bottom:10px;"><strong>Katakana (Romaji):</strong><br>`;
+                katakanaData.forEach(k => {
+                    contentHTML += `
+                        <div style="margin-top:3px; font-size:0.9em;">
+                            <span style="color:#e67e22; font-weight:bold;">${k.text}</span> → ${k.romaji}
+                        </div>`;
                 });
                 contentHTML += `</div>`;
             }
