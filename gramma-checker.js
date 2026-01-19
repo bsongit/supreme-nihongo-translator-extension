@@ -10,10 +10,10 @@ class JapaneseGrammarScanner {
         return [
             // N5
                   // N5 - Ajustado para evitar falsos positivos
-            { pattern: /(?<!で)は(?!です|した)/g, level: "N5", description: "Partícula de tópico" },
-            { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula de sujeito" },
-            { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula de objeto direto" },
-            { pattern: /(?<!で)も(?!の|う)/g, level: "N5", description: "Partícula 'também'" },
+            { pattern: /(?<!で)は(?!です|した)/g, level: "N5", description: "Particula 'wa', marca o tópico da frase" },
+            { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula 'ga', Indica o sujeito da frase, especialmente para dar ênfase, introduzir novas informações ou com verbos de habilidade/afinidade. Também pode indicar 'mas' quando está no final de uma frase." },
+            { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula 'wo', Indica o objeto direto de um verbo transitivo. Na fala moderna, pronuncia-se 'o', e não 'wo'." },
+            { pattern: /(?<!で)も(?!の|う)/g, level: "N5", description: "Partícula 'mo', Indica também'" },
             { pattern: /(?<!で)に(?!は|も|の|します)/g, level: "N5", description: "Partícula de tempo/destino" },
             { pattern: /(?<!で)で(?![すしょ])/g, level: "N5", description: "Partícula de local/instrumento" },
             { pattern: /(?<!で)へ(?!の)/g, level: "N5", description: "Partícula de direção" },

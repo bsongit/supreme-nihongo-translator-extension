@@ -163,7 +163,6 @@
                     <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
                         <strong>🇯🇵 Japonês Detectado</strong>
                     </div>
-                    <div style="margin-bottom: 8px;">${translation.translated.join('<br>')}</div>
                 `;
             } else {
                 // === PT -> JP ===
@@ -175,6 +174,9 @@
                 katakanaData = this.katakanaChecker.scan(textToRead);
 
                 contentHTML = `
+                    <div style="background: #e8f5e9; padding: 8px; border-radius: 4px; margin-bottom: 10px; font-weight: bold; color: #2e7d32;">
+                        ${textToRead}
+                    </div>
                     <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
                         <strong>🇧🇷 Português Detectado</strong>
                     </div>
@@ -190,6 +192,32 @@
                     🔊 Ouvir Pronúncia
                 </button>
             `;
+
+            // Estruturas Gramaticais
+            if (grammarData && grammarData.length > 0) {
+                contentHTML += `<div style="background:#e8f4f8; padding:8px; border-radius:4px;"><strong>Gramática:</strong><br>`;
+                grammarData.forEach(g => {
+                    contentHTML += `
+                        <div style="margin-top:5px; font-size:0.9em;">
+                            <span style="color:#2980b9; font-weight:bold;">${g.text}</span> (${g.level})<br>
+                            ${g.description}
+                        </div>
+                    `;
+                });
+                contentHTML += `</div>`;
+            }
+
+            // Identificação de Katakana (Loanwords)
+            if (katakanaData && katakanaData.length > 0) {
+                contentHTML += `<div style="background:#fff3e0; padding:8px; border-radius:4px; margin-bottom:10px;"><strong>Katakana (Romaji):</strong><br>`;
+                katakanaData.forEach(k => {
+                    contentHTML += `
+                        <div style="margin-top:3px; font-size:0.9em;">
+                            <span style="color:#e67e22; font-weight:bold;">${k.text}</span> → ${k.romaji}
+                        </div>`;
+                });
+                contentHTML += `</div>`;
+            }
 
             // Detalhes de Kanji/Vocabulário
             if (kanjiData && kanjiData.length > 0) {
@@ -210,31 +238,8 @@
                 contentHTML += `</div>`;
             }
 
-            // Identificação de Katakana (Loanwords)
-            if (katakanaData && katakanaData.length > 0) {
-                contentHTML += `<div style="background:#fff3e0; padding:8px; border-radius:4px; margin-bottom:10px;"><strong>Katakana (Romaji):</strong><br>`;
-                katakanaData.forEach(k => {
-                    contentHTML += `
-                        <div style="margin-top:3px; font-size:0.9em;">
-                            <span style="color:#e67e22; font-weight:bold;">${k.text}</span> → ${k.romaji}
-                        </div>`;
-                });
-                contentHTML += `</div>`;
-            }
 
-            // Estruturas Gramaticais
-            if (grammarData && grammarData.length > 0) {
-                contentHTML += `<div style="background:#e8f4f8; padding:8px; border-radius:4px;"><strong>Gramática:</strong><br>`;
-                grammarData.forEach(g => {
-                    contentHTML += `
-                        <div style="margin-top:5px; font-size:0.9em;">
-                            <span style="color:#2980b9; font-weight:bold;">${g.text}</span> (${g.level})<br>
-                            ${g.description}
-                        </div>
-                    `;
-                });
-                contentHTML += `</div>`;
-            }
+
 
             // Renderiza e exibe
             this.popup.innerHTML = contentHTML;
