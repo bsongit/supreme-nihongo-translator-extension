@@ -22,7 +22,7 @@
         async init() {
             try {
                 // Carrega o dataset do arquivo local da extensão
-                const dataUrl = chrome.runtime.getURL('nerver_read_files_here/main_dataset_pt.json');
+                const dataUrl = chrome.runtime.getURL('nerver_read_files_here/main_dataset.json');
                 const response = await fetch(dataUrl);
                 this.dataset = await response.json();
 
@@ -131,9 +131,9 @@
 
                     if (type === 'kanji') {
                         const data = this.currentData.kanji[index];
-                        const char = data.char || (data.variants ? Object.keys(data.variants)[0] : '?');
+                        const char = data.char || '?';
                         const reading = data.on ? data.on.join(', ') : (data.kun ? data.kun.join(', ') : '');
-                        const meaning = data.ptbr || (data.meanings ? data.meanings[0] : '');
+                        const meaning = data.description || '';
                         content = `
                             <div style="color: #e91e63; font-weight: bold; font-size: 1.5em; margin-bottom: 5px;">Kanji: ${char}</div>
                             <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;">${meaning}</div>
@@ -177,14 +177,11 @@
 
         findAndDisplayVariant(text) {
             const infoBox = document.getElementById('nihongo-info-box');
-            if (!infoBox || !this.currentData.kanji) return;
+            if (!infoBox || !this.dataset) return;
 
             let foundMeaning = null;
-            for (const entry of this.currentData.kanji) {
-                if (entry.variants && entry.variants[text]) {
-                    foundMeaning = entry.variants[text];
-                    break;
-                }
+            if (this.dataset[text]) {
+                foundMeaning = this.dataset[text].description;
             }
 
             if (foundMeaning) {
@@ -304,7 +301,7 @@
             // Marca Kanji (Prioridade alta - sobrescreve se necessário)
             if (kanjiData) {
                 kanjiData.forEach((k, idx) => {
-                    const char = k.char || (k.variants ? Object.keys(k.variants)[0] : '');
+                    const char = k.char || '';
                     for (let i = 0; i < textToRead.length; i++) {
                         if (textToRead[i] === char) {
                             charMap[i].type = 'kanji';

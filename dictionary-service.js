@@ -25,7 +25,7 @@ class DictionaryService {
 
         // 1. Try to find the whole word/phrase first
         if (this.dataset[text]) {
-            const entry = this.dataset[text];
+            const entry = { ...this.dataset[text], char: text };
             results.translated.push(this.formatEntryMeaning(entry));
             results.kanjiBreakdown.push(entry);
         } else {
@@ -33,14 +33,12 @@ class DictionaryService {
             // Note: A simple char iteration. For better results, a tokenizer (like Kuromoji) is recommended.
             for (const char of text) {
                 if (this.dataset[char]) {
-                    const entry = this.dataset[char];
+                    const entry = { ...this.dataset[char], char: char };
                     results.kanjiBreakdown.push(entry);
                     
                     // Add primary meaning to translation list if not too cluttered
-                    if (entry.ptbr) {
-                        results.translated.push(`${char}: ${entry.ptbr}`);
-                    } else if (entry.meanings && entry.meanings.length > 0) {
-                        results.translated.push(`: ${entry.meanings[0]}`);
+                    if (entry.description) {
+                        results.translated.push(`${char}: ${entry.description}`);
                     }
                 }
             }
@@ -66,23 +64,14 @@ class DictionaryService {
         for (const [key, entry] of Object.entries(this.dataset)) {
             let score = 0;
             
-            // Check PTBR field
-            if (entry.ptbr && typeof entry.ptbr === 'string') {
-                if (entry.ptbr.toLowerCase() === text.toLowerCase()) score += 10; // Exact match
-                else if (entry.ptbr.toLowerCase().includes(text.toLowerCase())) score += 5;
-            }
-
-            // Check Meanings array
-            if (entry.meanings && Array.isArray(entry.meanings)) {
-                for (const meaning of entry.meanings) {
-                    if (meaning.toLowerCase().includes(text.toLowerCase())) {
-                        score += 2;
-                    }
-                }
+            // Check description field
+            if (entry.description && typeof entry.description === 'string') {
+                if (entry.description.toLowerCase() === text.toLowerCase()) score += 10; // Exact match
+                else if (entry.description.toLowerCase().includes(text.toLowerCase())) score += 5;
             }
 
             if (score > 0) {
-                matches.push({ key, entry, score });
+                matches.push({ key, entry: { ...entry, char: key }, score });
             }
         }
 
@@ -101,8 +90,7 @@ class DictionaryService {
     }
 
     formatEntryMeaning(entry) {
-        if (entry.ptbr) return entry.ptbr;
-        if (entry.meanings && entry.meanings.length > 0) return entry.meanings.join('; ');
+        if (entry.description) return entry.description;
         return "Sem definição";
     }
 }

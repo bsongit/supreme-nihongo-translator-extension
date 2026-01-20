@@ -1,27 +1,16 @@
 {
-     "九": {
-    "char": "九",
-    "variants": {
-      "九州": "(kyuushuu) - Kyushu (a mais ao sul das quatro ilhas principais do Japão)",
-      "九": "(nove) - nove"
-    },
-    "strokes": 2,
-    "jlpt": 5,
-    "meanings": [
-      "Nove"
-    ],
+      "制": {
+    "description": "(sei) - controle, sistema, organização, organização, comando imperial, leis, regulamento, controle, governo, repressão, contenção, freio, estabelecimento",
+    "strokes": 8,
+    "jlpt": 3,
     "on": [
-      "きゅう",
-      "く"
+      "せい"
     ],
-    "kun": [
-      "ここの",
-      "ここの.つ",
-      "!ここの"
-    ],
+    "kun": [],
     "radicals": [
-      "Nove"
-    ],
-    "ptbr": "nove"
-  }
+      "Life",
+      "Towel",
+      "Faca"
+    ]
+  },...
 }

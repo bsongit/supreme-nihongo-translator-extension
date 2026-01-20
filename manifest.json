@@ -9,7 +9,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["nerver_read_files_here/main_dataset_pt.json"],
+      "resources": ["nerver_read_files_here/main_dataset.json"],
       "matches": ["<all_urls>"]
     }
   ],
