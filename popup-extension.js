@@ -50,17 +50,17 @@
             this.popup.style.cssText = `
                 position: absolute;
                 z-index: 2147483647;
-                background: white;
-                border: 1px solid #ccc;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                padding: 15px;
-                border-radius: 8px;
-                max-width: 450px;
-                max-height: 500px;
+                background: #ffffff;
+                border: none;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                padding: 20px;
+                border-radius: 12px;
+                max-width: 420px;
+                max-height: 600px;
                 overflow-y: auto;
-                font-family: Arial, sans-serif;
+                font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                 font-size: 14px;
-                line-height: 1.5;
+                line-height: 1.6;
                 color: #333;
                 display: none;
                 text-align: left;
@@ -160,8 +160,9 @@
                 katakanaData = this.katakanaChecker.scan(text);
 
                 contentHTML = `
-                    <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
-                        <strong>🇯🇵 Japonês Detectado</strong>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                        <strong style="font-size: 1.1em; color: #444;">🇯🇵 Japonês Detectado</strong>
+                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0 5px;">&times;</button>
                     </div>
                 `;
             } else {
@@ -174,33 +175,37 @@
                 katakanaData = this.katakanaChecker.scan(textToRead);
 
                 contentHTML = `
-                    <div style="background: #e8f5e9; padding: 8px; border-radius: 4px; margin-bottom: 10px; font-weight: bold; color: #2e7d32;">
-                        ${textToRead}
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; font-weight: bold; color: #2e7d32; flex: 1; margin-right: 10px;">
+                            ${textToRead}
+                        </div>
+                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0 5px;">&times;</button>
                     </div>
                     <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
                         <strong>🇧🇷 Português Detectado</strong>
                     </div>
-                    <div style="margin-bottom: 8px;">
-                        <strong>Equivalente JP:</strong> <span style="font-size: 1.2em; color: #2c3e50;">${textToRead}</span>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Equivalente JP:</strong> <span style="font-size: 1.3em; color: #2c3e50; font-weight: bold;">${textToRead}</span>
                     </div>
                 `;
             }
 
             // Botão de Áudio
             contentHTML += `
-                <button id="nihongo-speak-btn" style="background:#4CAF50; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-bottom:10px;">
-                    🔊 Ouvir Pronúncia
+                <button id="nihongo-speak-btn" style="width: 100%; background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <span style="font-size: 1.2em;">🔊</span> Ouvir Pronúncia
                 </button>
             `;
 
             // Estruturas Gramaticais
             if (grammarData && grammarData.length > 0) {
-                contentHTML += `<div style="background:#e8f4f8; padding:8px; border-radius:4px;"><strong>Gramática:</strong><br>`;
+                contentHTML += `<div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:15px;">
+                    <strong style="color: #0277bd; display: block; margin-bottom: 8px;">Gramática:</strong>`;
                 grammarData.forEach(g => {
                     contentHTML += `
-                        <div style="margin-top:5px; font-size:0.9em;">
-                            <div style="color:#555; margin-bottom:2px;">...${g.formattedContext}...</div>
-                            <span style="color:#2980b9; font-weight:bold; font-size:0.9em;">${g.level}</span>: ${g.description}
+                        <div style="margin-top:8px; font-size:0.95em; border-left: 3px solid #29b6f6; padding-left: 8px;">
+                            <div style="color:#555; margin-bottom:2px; font-family: monospace; background: rgba(255,255,255,0.5); padding: 2px;">...${g.formattedContext}...</div>
+                            <span style="color:#0277bd; font-weight:bold;">${g.level}</span>: ${g.description}
                         </div>
                     `;
                 });
@@ -209,7 +214,7 @@
 
             // Identificação de Katakana (Loanwords)
             if (katakanaData && katakanaData.length > 0) {
-                contentHTML += `<div style="background:#fff3e0; padding:8px; border-radius:4px; margin-bottom:10px;"><strong>Katakana (Romaji):</strong><br>`;
+                contentHTML += `<div style="background:#fff3e0; padding:12px; border-radius:8px; margin-bottom:15px;"><strong>Katakana (Romaji):</strong><br>`;
                 katakanaData.forEach(k => {
                     
                     contentHTML += `
@@ -222,7 +227,7 @@
 
             // Detalhes de Kanji/Vocabulário
             if (kanjiData && kanjiData.length > 0) {
-                contentHTML += `<div style="background:#f9f9f9; padding:8px; border-radius:4px; margin-bottom:10px;">`;
+                contentHTML += `<div style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:15px; border: 1px solid #eee;">`;
                 kanjiData.forEach(entry => {
                     // --- INÍCIO DA ADIÇÃO: Exibir Variantes (Vocabulário) PRIMEIRO ---
                     if (entry.variants) {
@@ -269,10 +274,16 @@
                     const meaning = entry.ptbr || (entry.meanings ? entry.meanings[0] : '');
                     
                     contentHTML += `
-                        <div style="margin-bottom: 5px; border-bottom: 1px dashed #ddd; padding-bottom: 3px;">
-                            <span style="color:#e74c3c; font-weight:bold;">${char}</span> 
-                            <span style="font-size:0.9em;">(${reading})</span>: ${meaning}<br>
-                            <span style="font-size:0.8em; color:#666;">JLPT: N${entry.jlpt || '-'} | Traços: ${entry.strokes || '-'}</span>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 10px;">
+                            <div style="font-size: 3em; color: #e74c3c; font-weight: bold; margin-right: 15px; min-width: 60px; text-align: center; line-height: 1;">${char}</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 2px;">${meaning}</div>
+                                <div style="font-size: 0.95em; color: #555; margin-bottom: 4px;">${reading}</div>
+                                <div style="font-size: 0.85em; color: #888;">
+                                    <span style="background: #f5f5f5; padding: 2px 6px; border-radius: 4px;">JLPT N${entry.jlpt || '-'}</span>
+                                    <span style="margin-left: 8px;">Traços: ${entry.strokes || '-'}</span>
+                                </div>
+                            </div>
                         </div>
                     `;
                 });
@@ -291,6 +302,14 @@
             // Attach evento de clique no botão de áudio recém-criado
             const btn = document.getElementById('nihongo-speak-btn');
             if (btn) btn.onclick = () => this.speaker.readText(textToRead);
+
+            // Attach evento de fechar
+            const closeBtn = document.getElementById('nihongo-close-btn');
+            if (closeBtn) closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.popup.style.display = 'none';
+                this.speaker.stopReading();
+            };
         }
     }
 
