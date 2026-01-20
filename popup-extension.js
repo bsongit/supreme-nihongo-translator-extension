@@ -4,7 +4,7 @@
 
     class NihongoExtensionController {
         constructor() {
-            this.isActive = false; // Estado inicial: desativado
+            this.isActive = true; // Estado inicial: ativado
             this.dataset = null;
             this.popup = null;
             this.toast = null;
@@ -14,6 +14,7 @@
             this.grammarScanner = null;
             this.katakanaChecker = null;
             this.speaker = null;
+            this.currentData = { kanji: [], grammar: [], katakana: [] };
 
             this.init();
         }
@@ -54,9 +55,9 @@
                 border: none;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.2);
                 padding: 20px;
-                border-radius: 12px;
-                max-width: 420px;
-                max-height: 600px;
+                border-radius: 0;
+                width: 420px;
+                height: 500px;
                 overflow-y: auto;
                 font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                 font-size: 14px;
@@ -111,6 +112,88 @@
                     this.speaker.stopReading();
                 }
             });
+
+            // Event Delegation para interatividade do texto (Display Text)
+            this.popup.addEventListener('mouseover', (e) => {
+                // Se houver texto selecionado no popup, evita sobrescrever a info box com o hover
+                const selection = window.getSelection();
+                if (selection.toString().length > 0 && selection.anchorNode && this.popup.contains(selection.anchorNode)) {
+                    return;
+                }
+
+                const target = e.target.closest('.interactive-segment');
+                const infoBox = document.getElementById('nihongo-info-box');
+                
+                if (target && infoBox) {
+                    const type = target.dataset.type;
+                    const index = parseInt(target.dataset.index);
+                    let content = '';
+
+                    if (type === 'kanji') {
+                        const data = this.currentData.kanji[index];
+                        const char = data.char || (data.variants ? Object.keys(data.variants)[0] : '?');
+                        const reading = data.on ? data.on.join(', ') : (data.kun ? data.kun.join(', ') : '');
+                        const meaning = data.ptbr || (data.meanings ? data.meanings[0] : '');
+                        content = `
+                            <div style="color: #e91e63; font-weight: bold; font-size: 1.5em; margin-bottom: 5px;">Kanji: ${char}</div>
+                            <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;">${meaning}</div>
+                            <div style="color: #555; margin-bottom: 5px;">${reading}</div>
+                            <div style="font-size: 0.85em; color: #888;">JLPT N${data.jlpt || '-'} | Traços: ${data.strokes || '-'}</div>
+                        `;
+                    } else if (type === 'katakana') {
+                        const data = this.currentData.katakana[index];
+                        content = `
+                            <div style="color: #ff9800; font-weight: bold; font-size: 1.2em; margin-bottom: 5px;">Katakana</div>
+                            <div style="font-size: 1.1em;">${data.text} → <strong>${data.romaji}</strong></div>
+                        `;
+                    } else if (type === 'grammar') {
+                        const data = this.currentData.grammar[index];
+                        content = `
+                            <div style="color: #2196f3; font-weight: bold; font-size: 1.2em; margin-bottom: 5px;">Gramática</div>
+                            <div style="font-size: 1.1em; margin-bottom: 5px;">${data.match || data.text || ''}</div>
+                            <div style="color: #555;">
+                                <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: bold;">${data.level}</span>
+                                <span style="margin-left: 8px;">${data.description}</span>
+                            </div>
+                        `;
+                    }
+                    infoBox.innerHTML = content;
+                }
+            });
+
+            // Listener para seleção de texto (Vocabulário composto)
+            this.popup.addEventListener('mouseup', () => {
+                setTimeout(() => {
+                    const selection = window.getSelection();
+                    const text = selection.toString().trim();
+                    
+                    // Verifica se a seleção está dentro do popup e tem tamanho suficiente
+                    if (text.length >= 2 && selection.rangeCount > 0 && selection.anchorNode && this.popup.contains(selection.anchorNode)) {
+                        this.findAndDisplayVariant(text);
+                    }
+                }, 10);
+            });
+        }
+
+        findAndDisplayVariant(text) {
+            const infoBox = document.getElementById('nihongo-info-box');
+            if (!infoBox || !this.currentData.kanji) return;
+
+            let foundMeaning = null;
+            for (const entry of this.currentData.kanji) {
+                if (entry.variants && entry.variants[text]) {
+                    foundMeaning = entry.variants[text];
+                    break;
+                }
+            }
+
+            if (foundMeaning) {
+                infoBox.innerHTML = `
+                    <div style="color: #673ab7; font-weight: bold; font-size: 1.2em; margin-bottom: 5px;">Vocabulário Selecionado</div>
+                    <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 5px;">${text}</div>
+                    <div style="font-size: 1.1em; color: #333;">${foundMeaning}</div>
+                `;
+            }
         }
 
         toggleActiveState() {
@@ -159,12 +242,12 @@
                 grammarData = this.grammarScanner.scanTextOptimized(text);
                 katakanaData = this.katakanaChecker.scan(text);
 
-                contentHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                        <strong style="font-size: 1.1em; color: #444;">🇯🇵 Japonês Detectado</strong>
-                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0 5px;">&times;</button>
-                    </div>
-                `;
+                // Header
+                contentHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Japonês Detectado</span>
+                    <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                </div>`;
             } else {
                 // === PT -> JP ===
                 const translation = this.dictionaryService.translateToJP(text);
@@ -174,21 +257,97 @@
                 grammarData = this.grammarScanner.scanTextOptimized(textToRead);
                 katakanaData = this.katakanaChecker.scan(textToRead);
 
-                contentHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; font-weight: bold; color: #2e7d32; flex: 1; margin-right: 10px;">
-                            ${textToRead}
-                        </div>
-                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0 5px;">&times;</button>
-                    </div>
-                    <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">
-                        <strong>🇧🇷 Português Detectado</strong>
-                    </div>
-                    <div style="margin-bottom: 12px;">
-                        <strong>Equivalente JP:</strong> <span style="font-size: 1.3em; color: #2c3e50; font-weight: bold;">${textToRead}</span>
-                    </div>
-                `;
+                // Header
+                contentHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Português -> Japonês</span>
+                    <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                </div>`;
             }
+
+            // Atualiza dados atuais para o event listener
+            this.currentData = { kanji: kanjiData, grammar: grammarData, katakana: katakanaData };
+
+            // === CONSTRUÇÃO DO TEXTO DE DISPLAY INTERATIVO ===
+            // Mapeia cada caractere para um tipo (Kanji, Katakana)
+            const charMap = new Array(textToRead.length).fill().map((_, i) => ({ char: textToRead[i], type: null, index: -1 }));
+
+            // Marca Gramática (Prioridade baixa - base)
+            if (grammarData) {
+                grammarData.forEach((g, idx) => {
+                    const str = g.match || g.text;
+                    if (str) {
+                        const start = textToRead.indexOf(str);
+                        if (start !== -1) {
+                            for (let i = start; i < start + str.length; i++) {
+                                charMap[i].type = 'grammar';
+                                charMap[i].index = idx;
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Marca Katakana (Prioridade média)
+            if (katakanaData) {
+                katakanaData.forEach((k, idx) => {
+                    const start = textToRead.indexOf(k.text);
+                    if (start !== -1) {
+                        for (let i = start; i < start + k.text.length; i++) {
+                            charMap[i].type = 'katakana';
+                            charMap[i].index = idx;
+                        }
+                    }
+                });
+            }
+
+            // Marca Kanji (Prioridade alta - sobrescreve se necessário)
+            if (kanjiData) {
+                kanjiData.forEach((k, idx) => {
+                    const char = k.char || (k.variants ? Object.keys(k.variants)[0] : '');
+                    for (let i = 0; i < textToRead.length; i++) {
+                        if (textToRead[i] === char) {
+                            charMap[i].type = 'kanji';
+                            charMap[i].index = idx;
+                        }
+                    }
+                });
+            }
+
+            // Gera HTML do Display Text
+            let displayTextHTML = '<div style="font-size: 2em; font-weight: 500; line-height: 1.4; color: #333; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">';
+            let lastType = null;
+            let lastIndex = -1;
+
+            for (let i = 0; i < charMap.length; i++) {
+                const curr = charMap[i];
+                if (curr.type !== lastType || curr.index !== lastIndex) {
+                    if (lastType !== null) displayTextHTML += '</span>';
+                    if (curr.type !== null) {
+                        let color = '#333';
+                        if (curr.type === 'kanji') color = '#e91e63';
+                        if (curr.type === 'katakana') color = '#ff9800';
+                        if (curr.type === 'grammar') color = '#2196f3';
+                        displayTextHTML += `<span class="interactive-segment" data-type="${curr.type}" data-index="${curr.index}" style="color: ${color}; cursor: pointer; border-bottom: 2px solid ${color}33; transition: background 0.2s;">`;
+                    }
+                }
+                displayTextHTML += curr.char;
+                lastType = curr.type;
+                lastIndex = curr.index;
+            }
+            if (lastType !== null) displayTextHTML += '</span>';
+            displayTextHTML += '</div>';
+
+            contentHTML += displayTextHTML;
+
+            // Área de Explicação (Info Box)
+            contentHTML += `
+                <div id="nihongo-info-box" style="background: #fff; padding: 15px; border-radius: 8px; min-height: 120px; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="color: #999; text-align: center; font-style: italic;">
+                        Passe o mouse sobre os itens coloridos (Kanji/Katakana) para ver detalhes.
+                    </div>
+                </div>
+            `;
 
             // Botão de Áudio
             contentHTML += `
@@ -196,102 +355,6 @@
                     <span style="font-size: 1.2em;">🔊</span> Ouvir Pronúncia
                 </button>
             `;
-
-            // Estruturas Gramaticais
-            if (grammarData && grammarData.length > 0) {
-                contentHTML += `<div style="background:#e8f4f8; padding:12px; border-radius:8px; margin-bottom:15px;">
-                    <strong style="color: #0277bd; display: block; margin-bottom: 8px;">Gramática:</strong>`;
-                grammarData.forEach(g => {
-                    contentHTML += `
-                        <div style="margin-top:8px; font-size:0.95em; border-left: 3px solid #29b6f6; padding-left: 8px;">
-                            <div style="color:#555; margin-bottom:2px; font-family: monospace; background: rgba(255,255,255,0.5); padding: 2px;">...${g.formattedContext}...</div>
-                            <span style="color:#0277bd; font-weight:bold;">${g.level}</span>: ${g.description}
-                        </div>
-                    `;
-                });
-                contentHTML += `</div>`;
-            }
-
-            // Identificação de Katakana (Loanwords)
-            if (katakanaData && katakanaData.length > 0) {
-                contentHTML += `<div style="background:#fff3e0; padding:12px; border-radius:8px; margin-bottom:15px;"><strong>Katakana (Romaji):</strong><br>`;
-                katakanaData.forEach(k => {
-                    
-                    contentHTML += `
-                        <div style="margin-top:3px; font-size:0.9em;">
-                            <span style="color:#e67e22; font-weight:bold;">${k.text}</span> → ${k.romaji}
-                        </div>`;
-                });
-                contentHTML += `</div>`;
-            }
-
-            // Detalhes de Kanji/Vocabulário
-            if (kanjiData && kanjiData.length > 0) {
-                contentHTML += `<div style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:15px; border: 1px solid #eee;">`;
-                kanjiData.forEach(entry => {
-                    // --- INÍCIO DA ADIÇÃO: Exibir Variantes (Vocabulário) PRIMEIRO ---
-                    if (entry.variants) {
-                        let variantKeys = Object.keys(entry.variants);
-                        if (variantKeys.length > 0) {
-                            // Filtra variantes se houver um match específico (mais de 1 caracter)
-                            const matches = variantKeys.filter(v => textToRead.includes(v));
-                            const hasLongMatch = matches.some(v => v.length > 1);
-                            
-                            if (hasLongMatch) {
-                                variantKeys = matches;
-                            }
-
-                            // Ordena para que variantes encontradas no texto apareçam primeiro
-                            variantKeys.sort((a, b) => {
-                                const aInText = textToRead.includes(a);
-                                const bInText = textToRead.includes(b);
-                                return (bInText ? 1 : 0) - (aInText ? 1 : 0);
-                            });
-
-                            contentHTML += `<div style="background: #fff8e1; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #ffe0b2;">`;
-                            contentHTML += `<div style="font-size: 0.85em; font-weight: bold; color: #f57c00; margin-bottom: 5px;">Vocabulário / Contexto:</div>`;
-                            
-                            [variantKeys[0]].forEach(variant => {
-                                const isMatch = textToRead.includes(variant);
-                                const rowStyle = isMatch 
-                                    ? "background: #ffe0b2; padding: 3px 5px; border-radius: 3px; margin-bottom: 4px; border-left: 3px solid #ef6c00;" 
-                                    : "margin-bottom: 3px;";
-                                const wordStyle = isMatch
-                                    ? "color: #bf360c; font-weight: bold;"
-                                    : "color: #333; font-weight: bold;";
-
-                                contentHTML += `<div style="font-size: 0.9em; line-height: 1.3; ${rowStyle}">
-                                    <span style="${wordStyle}">${variant}</span>: ${entry.variants[variant]}
-                                </div>`;
-                            });
-                            contentHTML += `</div>`;
-                        }
-                    }
-                    // --- FIM DA ADIÇÃO ---
-
-                    const char = entry.char || (entry.variants ? Object.keys(entry.variants)[0] : '?');
-                    const reading = entry.on ? entry.on.join(', ') : (entry.kun ? entry.kun.join(', ') : '');
-                    const meaning = entry.ptbr || (entry.meanings ? entry.meanings[0] : '');
-                    
-                    contentHTML += `
-                        <div style="display: flex; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 10px;">
-                            <div style="font-size: 3em; color: #e74c3c; font-weight: bold; margin-right: 15px; min-width: 60px; text-align: center; line-height: 1;">${char}</div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 2px;">${meaning}</div>
-                                <div style="font-size: 0.95em; color: #555; margin-bottom: 4px;">${reading}</div>
-                                <div style="font-size: 0.85em; color: #888;">
-                                    <span style="background: #f5f5f5; padding: 2px 6px; border-radius: 4px;">JLPT N${entry.jlpt || '-'}</span>
-                                    <span style="margin-left: 8px;">Traços: ${entry.strokes || '-'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                contentHTML += `</div>`;
-            }
-
-
-
 
             // Renderiza e exibe
             this.popup.innerHTML = contentHTML;
