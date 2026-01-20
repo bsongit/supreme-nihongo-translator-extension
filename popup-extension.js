@@ -146,6 +146,9 @@
                             <div style="color: #ff9800; font-weight: bold; font-size: 1.2em; margin-bottom: 5px;">Katakana</div>
                             <div style="font-size: 1.1em;">${data.text} → <strong>${data.romaji}</strong></div>
                         `;
+                       content += this.dataset && this.dataset[data.text]?  `
+                            <div style="font-size: 1.1em;">${this.dataset[data.text].description}</div>
+                        ` : ``;
                     } else if (type === 'grammar') {
                         const data = this.currentData.grammar[index];
                         content = `
