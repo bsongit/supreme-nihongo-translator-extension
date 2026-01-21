@@ -3,8 +3,9 @@
 // Escuta mensagens do Content Script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'CAPTURE_VISIBLE_TAB') {
+        const windowId = sender.tab ? sender.tab.windowId : null;
         // Captura a aba ativa como uma imagem PNG (base64)
-        chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+        chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {
             if (chrome.runtime.lastError) {
                 sendResponse({ error: chrome.runtime.lastError.message });
             } else {

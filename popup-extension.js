@@ -5,6 +5,8 @@
     class NihongoExtensionController {
         constructor() {
             this.isActive = true; // Estado inicial: ativado
+            this.isSidebar = false;
+            this.lastPosition = { x: 0, y: 0 };
             this.dataset = null;
             this.popup = null;
             this.toast = null;
@@ -52,7 +54,8 @@
             // Estilos inline para garantir isolamento e aparência
             this.popup.style.cssText = `
                 position: absolute;
-                z-index: 2147483647;
+                z-index: 2147483647 !important;
+                transform: translateZ(0);
                 background: #ffffff;
                 border: none;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -274,6 +277,7 @@
         }
 
         processText(text, x, y) {
+            this.lastPosition = { x, y };
             const isJP = this.dictionaryService.isJapanese(text);
             let contentHTML = '';
             let textToRead = '';
@@ -293,7 +297,10 @@
                 contentHTML += `
                 <div class="nihongo-popup-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: move; background: #f5f5f5; padding: 5px; border-radius: 4px; user-select: none;">
                     <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Japonês Detectado</span>
-                    <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button id="nihongo-sidebar-btn" title="Alternar Sidebar" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #888; padding: 2px;">◫</button>
+                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                    </div>
                 </div>`;
             } else {
                 // === PT -> JP ===
@@ -308,7 +315,10 @@
                 contentHTML += `
                 <div class="nihongo-popup-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: move; background: #f5f5f5; padding: 5px; border-radius: 4px; user-select: none;">
                     <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Português -> Japonês</span>
-                    <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button id="nihongo-sidebar-btn" title="Alternar Sidebar" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #888; padding: 2px;">◫</button>
+                        <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
+                    </div>
                 </div>`;
             }
 
@@ -435,9 +445,7 @@
 
             // Renderiza e exibe
             this.popup.innerHTML = contentHTML;
-            this.popup.style.display = 'block';
-            this.popup.style.left = `${x}px`;
-            this.popup.style.top = `${y}px`;
+            this.updatePopupState();
 
             // Attach evento de clique no botão de áudio recém-criado
             const btn = document.getElementById('nihongo-speak-btn');
@@ -447,6 +455,13 @@
             const ocrBtn = document.getElementById('nihongo-ocr-btn');
             if (ocrBtn) ocrBtn.onclick = () => this.ocrService.startSelectionMode();
 
+            // Attach evento de Sidebar
+            const sidebarBtn = document.getElementById('nihongo-sidebar-btn');
+            if (sidebarBtn) sidebarBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.toggleSidebar();
+            };
+
             // Attach evento de fechar
             const closeBtn = document.getElementById('nihongo-close-btn');
             if (closeBtn) closeBtn.onclick = (e) => {
@@ -454,6 +469,36 @@
                 this.popup.style.display = 'none';
                 this.speaker.stopReading();
             };
+        }
+
+        toggleSidebar() {
+            this.isSidebar = !this.isSidebar;
+            this.updatePopupState();
+        }
+
+        updatePopupState() {
+            this.popup.style.display = 'block';
+            if (this.isSidebar) {
+                this.popup.style.position = 'fixed';
+                this.popup.style.top = '0';
+                this.popup.style.right = '0';
+                this.popup.style.left = 'auto';
+                this.popup.style.width = '400px';
+                this.popup.style.height = '100vh';
+                this.popup.style.resize = 'none';
+                this.popup.style.borderRadius = '0';
+                this.popup.style.boxShadow = '-5px 0 15px rgba(0,0,0,0.1)';
+            } else {
+                this.popup.style.position = 'absolute';
+                this.popup.style.top = `${this.lastPosition.y}px`;
+                this.popup.style.left = `${this.lastPosition.x}px`;
+                this.popup.style.right = 'auto';
+                this.popup.style.width = '420px';
+                this.popup.style.height = '500px';
+                this.popup.style.resize = 'both';
+                this.popup.style.borderRadius = '0';
+                this.popup.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            }
         }
     }
 

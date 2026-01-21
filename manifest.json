@@ -5,7 +5,12 @@
   "description": "Tradução e análise gramatical de Japonês/Português com popup ativado por atalho.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"

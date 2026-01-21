@@ -89,10 +89,10 @@ class OcrService {
         const left = Math.min(currentX, this.startX);
         const top = Math.min(currentY, this.startY);
 
-        this.selectionBox.style.width = `px`;
-        this.selectionBox.style.height = `px`;
-        this.selectionBox.style.left = `px`;
-        this.selectionBox.style.top = `px`;
+        this.selectionBox.style.width = `${width}px`;
+        this.selectionBox.style.height = `${height}px`;
+        this.selectionBox.style.left = `${left}px`;
+        this.selectionBox.style.top = `${top}px`;
     }
 
     async onMouseUp(e) {
@@ -117,11 +117,16 @@ class OcrService {
                 // 3. Executa OCR
                 await this.recognizeText(processedImage, rect);
             } else {
-                throw new Error("Falha ao capturar tela");
+                const errorMsg = response && response.error ? response.error : "Resposta vazia ou erro desconhecido";
+                throw new Error(`Falha ao capturar tela: ${errorMsg}`);
             }
         } catch (err) {
             console.error(err);
-            this.showToast("Erro no OCR: " + err.message);
+            if (err.message && err.message.includes("permission is required")) {
+                this.showToast("Erro: Adicione permissões (<all_urls>) no manifest.json");
+            } else {
+                this.showToast("Erro no OCR: " + err.message);
+            }
         }
     }
 
