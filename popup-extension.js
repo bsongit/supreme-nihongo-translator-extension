@@ -111,14 +111,26 @@
             });
 
             // Seleção de Texto
-            document.addEventListener('mouseup', (e) => {
-                if (!this.isActive) return;
-                
-                // Evita fechar/reabrir se clicar dentro do próprio popup
-                if (this.popup.contains(e.target)) return;
+            // Detecta se é um PDF (pelo Content-Type ou presença de embed)
+            const isPdf = document.contentType === 'application/pdf' || !!document.querySelector('embed[type="application/pdf"]');
 
-                this.handleSelection();
-            });
+            if (isPdf) {
+                // Em PDFs, o evento 'mouseup' é capturado pelo plugin. Usamos 'selectionchange' com debounce.
+                let selectionTimer = null;
+                document.addEventListener('selectionchange', () => {
+                    if (!this.isActive) return;
+                    clearTimeout(selectionTimer);
+                    selectionTimer = setTimeout(() => {
+                        if (window.getSelection().toString().trim().length > 0) this.handleSelection();
+                    }, 600);
+                });
+            } else {
+                document.addEventListener('mouseup', (e) => {
+                    if (!this.isActive) return;
+                    if (this.popup.contains(e.target)) return;
+                    this.handleSelection();
+                });
+            }
 
             // Fechar popup ao clicar fora
             document.addEventListener('mousedown', (e) => {
