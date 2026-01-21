@@ -59,6 +59,9 @@
                 width: 420px;
                 height: 500px;
                 overflow-y: auto;
+                resize: both;
+                min-width: 300px;
+                min-height: 200px;
                 font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                 font-size: 14px;
                 line-height: 1.6;
@@ -112,6 +115,36 @@
                     this.speaker.stopReading();
                 }
             });
+            
+            // Drag and Drop do Popup
+            this.popup.addEventListener('mousedown', (e) => {
+                // Apenas inicia o drag se clicar no cabeçalho
+                const header = e.target.closest('.nihongo-popup-header');
+                if (!header) return;
+                
+                e.preventDefault(); // Previne seleção de texto durante o arraste
+                
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const rect = this.popup.getBoundingClientRect();
+                const startLeft = rect.left + window.scrollX;
+                const startTop = rect.top + window.scrollY;
+
+                const onMouseMove = (moveEvent) => {
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+                    this.popup.style.left = `${startLeft + dx}px`;
+                    this.popup.style.top = `${startTop + dy}px`;
+                };
+
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
 
             // Event Delegation para interatividade do texto (Display Text)
             this.popup.addEventListener('mouseover', (e) => {
@@ -140,6 +173,11 @@
                             <div style="color: #555; margin-bottom: 5px;">${reading}</div>
                             <div style="font-size: 0.85em; color: #888;">JLPT N${data.jlpt || '-'} | Traços: ${data.strokes || '-'}</div>
                         `;
+                        
+                        // Feature: Áudio ao passar o mouse
+                        if (this.speaker && char) {
+                            this.speaker.readText(char);
+                        }
                     } else if (type === 'katakana') {
                         const data = this.currentData.katakana[index];
                         content = `
@@ -244,7 +282,7 @@
 
                 // Header
                 contentHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="nihongo-popup-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: move; background: #f5f5f5; padding: 5px; border-radius: 4px; user-select: none;">
                     <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Japonês Detectado</span>
                     <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
                 </div>`;
@@ -259,7 +297,7 @@
 
                 // Header
                 contentHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="nihongo-popup-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; cursor: move; background: #f5f5f5; padding: 5px; border-radius: 4px; user-select: none;">
                     <span style="font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 1px;">Português -> Japonês</span>
                     <button id="nihongo-close-btn" style="background: none; border: none; font-size: 24px; line-height: 1; cursor: pointer; color: #aaa; padding: 0;">&times;</button>
                 </div>`;
@@ -301,14 +339,39 @@
                 });
             }
 
+            // Helper para checar se um caractere é Katakana
+            const isKatakana = (char) => {
+                if (!char) return false;
+                const charCode = char.charCodeAt(0);
+                // Ranges Unicode para Katakana (bloco principal + extensões fonéticas)
+                return (charCode >= 0x30A0 && charCode <= 0x30FF) || 
+                       (charCode >= 0x31F0 && charCode <= 0x31FF);
+            };
+
             // Marca Kanji (Prioridade alta - sobrescreve se necessário)
             if (kanjiData) {
                 kanjiData.forEach((k, idx) => {
                     const char = k.char || '';
-                    for (let i = 0; i < textToRead.length; i++) {
-                        if (textToRead[i] === char) {
-                            charMap[i].type = 'kanji';
-                            charMap[i].index = idx;
+                    if (!char) return;
+
+                    let pos = -1;
+                    while ((pos = textToRead.indexOf(char, pos + 1)) !== -1) {
+                        if (char.length === 1 && isKatakana(char)) {
+                            // Se o caractere for um Katakana do dicionário, verifique se está isolado.
+                            // Se estiver adjacente a outros Katakanas, não o marque como 'kanji' (vermelho),
+                            // pois ele faz parte de uma palavra Katakana (laranja).
+                            const prevChar = pos > 0 ? textToRead[pos - 1] : null;
+                            const nextChar = pos < textToRead.length - 1 ? textToRead[pos + 1] : null;
+
+                            if (isKatakana(prevChar) || isKatakana(nextChar)) {
+                                // É parte de uma sequência, então pule a marcação.
+                                continue;
+                            }
+                        }
+                        // Marca como 'kanji' se for um kanji real ou um katakana isolado com entrada no dicionário.
+                        for (let i = 0; i < char.length; i++) {
+                            charMap[pos + i].type = 'kanji';
+                            charMap[pos + i].index = idx;
                         }
                     }
                 });

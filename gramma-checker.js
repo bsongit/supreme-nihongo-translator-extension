@@ -10,16 +10,16 @@ class JapaneseGrammarScanner {
         return [
             // N5
                   // N5 - Ajustado para evitar falsos positivos
-            { pattern: /(?<!で)は(?!です|した)/g, level: "N5", description: "Partícula 'wa'. Marca o tópico da frase, indicando sobre quem ou o que se está falando." },
+            { pattern: /(?<!で|ち|と)は(?!です|した)/g, level: "N5", description: "Partícula 'wa'. Marca o tópico da frase, indicando sobre quem ou o que se está falando." },
             { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula 'ga'. Indica o sujeito da frase, usada para dar ênfase, introduzir novas informações ou com verbos de habilidade/desejo." },
             { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula 'wo' (pronunciada 'o'). Indica o objeto direto de um verbo transitivo, ou seja, quem sofre a ação." },
-            { pattern: /(?<!で)も(?!の|う)/g, level: "N5", description: "Partícula 'mo'. Significa 'também' ou 'tampouco'. Substitui outras partículas para indicar inclusão." },
-            { pattern: /(?<!で)に(?!は|も|の|します)/g, level: "N5", description: "Partícula 'ni'. Indica tempo específico, ponto de destino (ir a), ou alvo de uma ação (dar a)." },
-            { pattern: /(?<!で)で(?![すしょ])/g, level: "N5", description: "Partícula 'de'. Indica o local onde uma ação ocorre ou o instrumento/meio utilizado para realizá-la." },
+            { pattern: /(?<!で|ど)も(?!の|う)/g, level: "N5", description: "Partícula 'mo'. Significa 'também' ou 'tampouco'. Substitui outras partículas para indicar inclusão." },
+            { pattern: /(?<!で|な)に(?!は|も|の|します)/g, level: "N5", description: "Partícula 'ni'. Indica tempo específico, ponto de destino (ir a), ou alvo de uma ação (dar a)." },
+            { pattern: /(?<!で)で(?!です|[すしょ])/g, level: "N5", description: "Partícula 'de'. Indica o local onde uma ação ocorre ou o instrumento/meio utilizado para realizá-la." },
             { pattern: /(?<!で)へ(?!の)/g, level: "N5", description: "Partícula 'he' (pronunciada 'e'). Indica a direção para onde se vai, focando no movimento." },
-            { pattern: /(?<!で)と(?!いう|思う)/g, level: "N5", description: "Partícula 'to'. Significa 'e' (para listas completas) ou 'com' (companhia). Também marca citações." },
+            { pattern: /(?<!で|っ)と(?!いう|思う)/g, level: "N5", description: "Partícula 'to'. Significa 'e' (para listas completas) ou 'com' (companhia). Também marca citações." },
             { pattern: /(?<!で)や(?!く)/g, level: "N5", description: "Partícula 'ya'. Significa 'e' (para listas não exaustivas, implicando que há mais itens)." },
-            { pattern: /(?<!で)の(?![ばりき])/g, level: "N5", description: "Partícula 'no'. Indica posse, modificação ou pertencimento (conecta substantivos)." },
+            { pattern: /(?<!で|た|き)の(?![ばりき])/g, level: "N5", description: "Partícula 'no'. Indica posse, modificação ou pertencimento (conecta substantivos)." },
             { pattern: /から(?![のと])/g, level: "N5", description: "Partícula 'kara'. Indica o ponto de partida (tempo/espaço) ou a causa/razão ('porque')." },
             { pattern: /(?<!でし)まで(?![のと])/g, level: "N5", description: "Partícula 'made'. Indica o limite final de tempo ou espaço ('até')." },
             
