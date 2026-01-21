@@ -8,8 +8,7 @@ class JapaneseGrammarScanner {
         // Dados das estruturas (aqui você poderia carregar de um arquivo)
         // Para simplificar, vou incluir as estruturas principais
         return [
-            // N5
-                  // N5 - Ajustado para evitar falsos positivos
+            // N5 - Ajustado para evitar falsos positivos
             { pattern: /(?<!で|ち|と)は(?!です|した)/g, level: "N5", description: "Partícula 'wa'. Marca o tópico da frase, indicando sobre quem ou o que se está falando." },
             { pattern: /(?<!で)が(?!あります|ありません)/g, level: "N5", description: "Partícula 'ga'. Indica o sujeito da frase, usada para dar ênfase, introduzir novas informações ou com verbos de habilidade/desejo." },
             { pattern: /(?<!で)を(?!の)/g, level: "N5", description: "Partícula 'wo' (pronunciada 'o'). Indica o objeto direto de um verbo transitivo, ou seja, quem sofre a ação." },
@@ -22,6 +21,8 @@ class JapaneseGrammarScanner {
             { pattern: /(?<!で|た|き)の(?![ばりき])/g, level: "N5", description: "Partícula 'no'. Indica posse, modificação ou pertencimento (conecta substantivos)." },
             { pattern: /から(?![のと])/g, level: "N5", description: "Partícula 'kara'. Indica o ponto de partida (tempo/espaço) ou a causa/razão ('porque')." },
             { pattern: /(?<!でし)まで(?![のと])/g, level: "N5", description: "Partícula 'made'. Indica o limite final de tempo ou espaço ('até')." },
+            { pattern: /がいます/g, level: "N5", description: "Indica a existência de seres animados (pessoas, animais). Significa 'há' ou 'tem'." },
+            { pattern: /ですが/g, level: "N5", description: "Conjunção adversativa formal ('mas', 'porém'). Usada para ligar frases ou suavizar a fala." },
             
             // Padrões mais complexos com prioridade alta (para evitar falsos positivos)
             { pattern: /てください(?![ょ])/g, level: "N5", description: "Forma 'te' + kudasai. Usada para fazer pedidos ou solicitações de maneira polida ('por favor, faça')." },
