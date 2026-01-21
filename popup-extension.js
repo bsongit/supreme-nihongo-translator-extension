@@ -17,6 +17,7 @@
             this.katakanaChecker = null;
             this.speaker = null;
             this.ocrService = null;
+            this.pdfReader = null;
             this.currentData = { kanji: [], grammar: [], katakana: [] };
 
             this.init();
@@ -36,9 +37,13 @@
                 // Tenta usar a instância global criada pelo speaker.js ou cria uma nova
                 this.speaker = window.reader || new JapaneseTextReader();
                 this.ocrService = new OcrService(this);
+                this.pdfReader = new PdfReader(this);
 
                 this.createDOM();
                 this.setupEventListeners();
+
+                // Verifica se deve abrir a sidebar automaticamente (Modo PDF)
+                await this.pdfReader.checkAutoSidebar();
 
                 console.log("Nihongo Extension carregada. Pressione Ctrl+Alt+V para ativar.");
             } catch (error) {
@@ -453,6 +458,11 @@
                 <button id="nihongo-ocr-btn" style="width: 100%; background: #607d8b; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <span>📷</span> Modo OCR (Recortar Imagem)
                 </button>
+
+                <!-- Botão PDF Reader -->
+                <button id="nihongo-pdf-btn" style="width: 100%; background: #ff5722; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px;">
+                    <span>📄</span> Abrir PDF
+                </button>
             `;
 
             // Renderiza e exibe
@@ -466,6 +476,10 @@
             // Attach evento de clique no botão OCR
             const ocrBtn = document.getElementById('nihongo-ocr-btn');
             if (ocrBtn) ocrBtn.onclick = () => this.ocrService.startSelectionMode();
+
+            // Attach evento de clique no botão PDF
+            const pdfBtn = document.getElementById('nihongo-pdf-btn');
+            if (pdfBtn) pdfBtn.onclick = () => this.pdfReader.showInput();
 
             // Attach evento de Sidebar
             const sidebarBtn = document.getElementById('nihongo-sidebar-btn');
