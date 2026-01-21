@@ -74,6 +74,19 @@
     "kun": [],
     "radicals": []
   },
+    "卜": {
+    "description": "(ぼく) - Divinar, escolher, decidir, fixar",
+    "strokes": 2,
+    "jlpt": 1,
+    "on": [
+      "ぼく"
+    ],
+    "kun": [
+      "うらな.う",
+      "うらない"
+    ],
+    "radicals": []
+  },
 
   "こ": {
     "description": "(っこ) - doing/in such a state; doing together/contest/match; familiarizing suffix (sometimes meaning \"small\")",

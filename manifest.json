@@ -7,9 +7,12 @@
     "activeTab",
     "scripting"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "web_accessible_resources": [
     {
-      "resources": ["nerver_read_files_here/main_dataset.json"],
+      "resources": ["nerver_read_files_here/main_dataset.json", "lib/tesseract.min.js", "lib/worker.min.js"],
       "matches": ["<all_urls>"]
     }
   ],
@@ -17,10 +20,12 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "lib/tesseract.min.js",
         "gramma-checker.js", 
         "katakana-checker.js",
         "speaker.js", 
         "dictionary-service.js", 
+        "ocr-service.js",
         "popup-extension.js"
       ],
       "run_at": "document_end"

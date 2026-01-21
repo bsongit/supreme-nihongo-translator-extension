@@ -14,6 +14,7 @@
             this.grammarScanner = null;
             this.katakanaChecker = null;
             this.speaker = null;
+            this.ocrService = null;
             this.currentData = { kanji: [], grammar: [], katakana: [] };
 
             this.init();
@@ -32,6 +33,7 @@
                 this.katakanaChecker = new KatakanaChecker();
                 // Tenta usar a instância global criada pelo speaker.js ou cria uma nova
                 this.speaker = window.reader || new JapaneseTextReader();
+                this.ocrService = new OcrService(this);
 
                 this.createDOM();
                 this.setupEventListeners();
@@ -95,6 +97,13 @@
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'v') {
                     this.toggleActiveState();
+                }
+                
+                // Atalho OCR: Ctrl + Alt + O
+                if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'o') {
+                    if (this.isActive && this.ocrService) {
+                        this.ocrService.startSelectionMode();
+                    }
                 }
             });
 
@@ -417,6 +426,11 @@
                 <button id="nihongo-speak-btn" style="width: 100%; background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <span style="font-size: 1.2em;">🔊</span> Ouvir Pronúncia
                 </button>
+                
+                <!-- Botão OCR -->
+                <button id="nihongo-ocr-btn" style="width: 100%; background: #607d8b; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>📷</span> Modo OCR (Recortar Imagem)
+                </button>
             `;
 
             // Renderiza e exibe
@@ -428,6 +442,10 @@
             // Attach evento de clique no botão de áudio recém-criado
             const btn = document.getElementById('nihongo-speak-btn');
             if (btn) btn.onclick = () => this.speaker.readText(textToRead);
+            
+            // Attach evento de clique no botão OCR
+            const ocrBtn = document.getElementById('nihongo-ocr-btn');
+            if (ocrBtn) ocrBtn.onclick = () => this.ocrService.startSelectionMode();
 
             // Attach evento de fechar
             const closeBtn = document.getElementById('nihongo-close-btn');
